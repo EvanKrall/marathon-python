@@ -1,5 +1,6 @@
 import json
 import re
+from lazy_object_proxy import Proxy
 
 from marathon.util import to_camel_case, to_snake_case, MarathonJsonEncoder, MarathonMinimalJsonEncoder
 
@@ -40,7 +41,10 @@ class MarathonObject(object):
 
         :param dict attributes: object attributes from parsed response
         """
-        return cls(**{to_snake_case(k): v for k, v in attributes.items()})
+        def factory():
+            return cls(**{to_snake_case(k): v for k, v in attributes.items()})
+
+        return Proxy(factory)
 
     def to_json(self, minimal=True):
         """Encode an object as a JSON string.
